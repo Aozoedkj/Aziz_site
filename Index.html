@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع عزيز</title>
+    <style>
+        /* ألوان وخلفية متناسقة */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #111, #1a1a2e, #16213e);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* الحاوية الرئيسية */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        h2 {
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: #e94560;
+            text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+        }
+
+        /* حقول الإدخال */
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 2px solid #0f3460;
+            border-radius: 10px;
+            background-color: #1a1a2e;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        input[type="text"]:focus {
+            border-color: #e94560;
+            box-shadow: 0 0 10px rgba(233, 69, 96, 0.3);
+        }
+
+        /* أزرار التنقل */
+        .btn {
+            background-color: #e94560;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: 0.3s ease;
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .btn:hover {
+            background-color: #ff5773;
+            transform: translateY(-2px);
+        }
+
+        /* خيارات الجنس (المربعات) */
+        .gender-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .gender-box {
+            background: #16213e;
+            border: 2px solid #0f3460;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            transition: 0.3s ease;
+            user-select: none;
+        }
+
+        .gender-box:hover {
+            border-color: #e94560;
+            background: rgba(233, 69, 96, 0.1);
+        }
+
+        /* المربع المحدد */
+        .gender-box.selected {
+            background: #e94560;
+            border-color: #ff5773;
+            color: white;
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.4);
+        }
+
+        /* إخفاء المراحل افتراضياً */
+        .step {
+            display: none;
+        }
+
+        /* إظهار المرحلة النشطة */
+        .active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* نص النتيجة النهائية */
+        .result-text {
+            font-size: 24px;
+            font-weight: bold;
+            line-height: 1.6;
+            margin: 20px 0;
+            color: #fff;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div id="step1" class="step active">
+            <h2>مرحباً بك في موقع عزيز 👋</h2>
+            <p style="color: #ccc; margin-bottom: 20px;">الرجاء كتابة اسمك للمتابعة:</p>
+            <input type="text" id="userName" placeholder="اكتب اسمك هنا..." autocomplete="off">
+            <br>
+            <button class="btn" onclick="goToStep2()">التالي</button>
+        </div>
+
+        <div id="step2" class="step">
+            <h2>اختر الجنس يا <span id="displayStep2Name" style="color: #ff5773;"></span></h2>
+            
+            <div class="gender-container">
+                <div class="gender-box" onclick="selectGender('ذكر', this)">👨 ذكر</div>
+                <div class="gender-box" onclick="selectGender('أنثى', this)">👩 أنثى</div>
+                <div class="gender-box" onclick="selectGender('فيمبوي', this)">✨ فيمبوي</div>
+            </div>
+
+            <button class="btn" onclick="showResult()">التالي</button>
+        </div>
+
+        <div id="step3" class="step">
+            <p id="resultOutput" class="result-text"></p>
+            <br>
+            <button class="btn" style="background-color: #0f3460;" onclick="restart()">إعادة من جديد</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedGender = "";
+
+        // الانتقال للمرحلة الثانية
+        function goToStep2() {
+            const name = document.getElementById('userName').value.trim();
+            if (name === "") {
+                alert("من فضلك اكتب اسمك أولاً! ⚠️");
+                return;
+            }
+            
+            document.getElementById('displayStep2Name').innerText = name;
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+        }
+
+        // تحديد الجنس عند الضغط على المربع
+        function selectGender(gender, element) {
+            selectedGender = gender;
+            
+            // إزالة التحديد من باقي المربعات
+            const boxes = document.querySelectorAll('.gender-box');
+            boxes.forEach(box => box.classList.remove('selected'));
+            
+            // إضافة التحديد للمربع المضغوط
+            element.classList.add('selected');
+        }
+
+        // عرض النتيجة النهائية بناءً على الخيار
+        function showResult() {
+            if (selectedGender === "") {
+                alert("من فضلك اختر الجنس للمتابعة! ⚠️");
+                return;
+            }
+
+            let resultMsg = "";
+            if (selectedGender === "أنثى") {
+                resultMsg = "اسمحيلي منبغيش البنات😓";
+            } else if (selectedGender === "ذكر") {
+                resultMsg = "امشي تقود 😥";
+            } else if (selectedGender === "فيمبوي") {
+                resultMsg = "اححح ممكن نتزوج 😳👉👈";
+            }
+
+            document.getElementById('resultOutput').innerText = resultMsg;
+            
+            document.getElementById('step2').classList.remove('active');
+            document.getElementById('step3').classList.add('active');
+        }
+
+        // إعادة تشغيل الكود
+        function restart() {
+            selectedGender = "";
+            document.getElementById('userName').value = "";
+            const boxes = document.querySelectorAll('.gender-box');
+            boxes.forEach(box => box.classList.remove('selected'));
+
+            document.getElementById('step3').classList.remove('active');
+            document.getElementById('step1').classList.add('active');
+        }
+    </script>
+
+</body>
+</html>
